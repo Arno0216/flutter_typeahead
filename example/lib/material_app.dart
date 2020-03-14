@@ -1,7 +1,6 @@
+import 'package:example/data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-
-import 'package:example/data.dart';
 
 class MyMaterialApp extends StatelessWidget {
   @override
@@ -48,26 +47,21 @@ class NavigationExample extends StatelessWidget {
           TypeAheadField(
             textFieldConfiguration: TextFieldConfiguration(
               autofocus: true,
-              style: DefaultTextStyle.of(context)
-                  .style
-                  .copyWith(fontStyle: FontStyle.italic),
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'What are you looking for?'),
+              style: DefaultTextStyle.of(context).style.copyWith(fontStyle: FontStyle.italic),
+              decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'What are you looking for?'),
             ),
             suggestionsCallback: (pattern) async {
               return await BackendService.getSuggestions(pattern);
             },
-            itemBuilder: (context, suggestion) {
+            itemBuilder: (context, suggestion, index) {
               return ListTile(
                 leading: Icon(Icons.shopping_cart),
                 title: Text(suggestion['name']),
                 subtitle: Text('\$${suggestion['price']}'),
               );
             },
-            onSuggestionSelected: (suggestion) {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => ProductPage(product: suggestion)));
+            onSuggestionSelected: (suggestion, index) {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductPage(product: suggestion)));
             },
           ),
         ],
@@ -104,16 +98,16 @@ class _FormExampleState extends State<FormExample> {
               suggestionsCallback: (pattern) {
                 return CitiesService.getSuggestions(pattern);
               },
-              itemBuilder: (context, suggestion) {
+              itemBuilder: (context, suggestion, index) {
                 return ListTile(
-                  title: Text(suggestion),
+                  title: Text('$index: $suggestion'),
                 );
               },
               transitionBuilder: (context, suggestionsBox, controller) {
                 return suggestionsBox;
               },
-              onSuggestionSelected: (suggestion) {
-                this._typeAheadController.text = suggestion;
+              onSuggestionSelected: (suggestion, index) {
+                this._typeAheadController.text = index.toString();
               },
               validator: (value) {
                 if (value.isEmpty) {
@@ -130,9 +124,8 @@ class _FormExampleState extends State<FormExample> {
               onPressed: () {
                 if (this._formKey.currentState.validate()) {
                   this._formKey.currentState.save();
-                  Scaffold.of(context).showSnackBar(SnackBar(
-                      content:
-                      Text('Your Favorite City is ${this._selectedCity}')));
+                  Scaffold.of(context)
+                      .showSnackBar(SnackBar(content: Text('Your Favorite City is ${this._selectedCity}')));
                 }
               },
             )
@@ -151,29 +144,24 @@ class ScrollExample extends StatelessWidget {
     return ListView(children: [
       Center(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text("Suggestion box will resize when scrolling"),
-          )),
+        padding: const EdgeInsets.all(8.0),
+        child: Text("Suggestion box will resize when scrolling"),
+      )),
       SizedBox(height: 200),
       TypeAheadField<String>(
         getImmediateSuggestions: true,
         textFieldConfiguration: TextFieldConfiguration(
-          decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'What are you looking for?'),
+          decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'What are you looking for?'),
         ),
         suggestionsCallback: (String pattern) async {
-          return items
-              .where((item) =>
-              item.toLowerCase().startsWith(pattern.toLowerCase()))
-              .toList();
+          return items.where((item) => item.toLowerCase().startsWith(pattern.toLowerCase())).toList();
         },
-        itemBuilder: (context, String suggestion) {
+        itemBuilder: (context, String suggestion, int index) {
           return ListTile(
             title: Text(suggestion),
           );
         },
-        onSuggestionSelected: (String suggestion) {
+        onSuggestionSelected: (String suggestion, int index) {
           print("Suggestion selected");
         },
       ),
